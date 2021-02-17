@@ -52,16 +52,22 @@ class Tracer
     protected $unsetParentIdForBackend = false;
 
     /**
+     * @var Identifier
+     */
+    protected $traceParentSpanId;
+
+    /**
      * Tracer constructor.
-     * 
+     *
      * @param $name string Name of trace
      * @param $endpoint Endpoint Current application info
      * @param $logger Logger Trace save handler
      * @param $sampler bool|Sampler Set or calculate 'Sampled' - default true
      * @param $traceId Identifier TraceId - default TraceIdentifier
-     * @param $traceSpanId Identifier TraceSpanId/ParentSpanId/ParentId - default SpandIdentifier
+     * @param $traceSpanId Identifier TraceSpanId - default SpandIdentifier
+     * @param $traceParentSpanId Identifier ParentSpanId/ParentId - default null
      */
-    public function __construct($name, $endpoint, $logger, $sampler = null, $traceId = null, $traceSpanId = null)
+    public function __construct($name, $endpoint, $logger, $sampler = null, $traceId = null, $traceSpanId = null, $traceParentSpanId = null)
     {
         TracerInfo::init($sampler, $traceId, $traceSpanId);
 
@@ -72,6 +78,7 @@ class Tracer
         $this->startTimestamp = zipkin_timestamp();
 
         $this->unsetParentIdForBackend = $traceSpanId === null;
+        $this->traceParentSpanId = $traceParentSpanId;
     }
 
     /**
@@ -131,7 +138,10 @@ class Tracer
                 $this->startTimestamp,
                 zipkin_timestamp(),
                 AnnotationBlock::SERVER
-            )
+            ),
+            null,
+            null,
+            $this->traceParentSpanId
         );
         if ($unsetParentId) {
             $span->unsetParentId();
