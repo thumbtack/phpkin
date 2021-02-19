@@ -67,7 +67,16 @@ class Tracer
      * @param $traceSpanId Identifier TraceSpanId - default SpandIdentifier
      * @param $traceParentSpanId Identifier ParentSpanId/ParentId - default null
      */
-    public function __construct($name, $endpoint, $logger, $sampler = null, $traceId = null, $traceSpanId = null, $traceParentSpanId = null)
+    public function __construct(
+        $name,
+        $endpoint,
+        $logger,
+        $sampler = null,
+        $traceId = null,
+        $traceSpanId = null,
+        $traceParentSpanId = null,
+        $startTimestamp = null
+    )
     {
         TracerInfo::init($sampler, $traceId, $traceSpanId);
 
@@ -75,7 +84,7 @@ class Tracer
         $this->setEndpoint($endpoint);
         $this->setLogger($logger);
 
-        $this->startTimestamp = zipkin_timestamp();
+        $this->startTimestamp = $startTimestamp ?: zipkin_timestamp();
 
         $this->unsetParentIdForBackend = $traceSpanId === null;
         $this->traceParentSpanId = $traceParentSpanId;
