@@ -71,7 +71,9 @@ class SimpleHttpLogger implements Logger
     protected function validResponse($headers)
     {
         foreach ($headers as $header) {
-            if (preg_match('/202/', $header)) {
+            // We want to match the status header (e.g. "HTTP/1.1 202 Accepted") but not any other
+            // headers that might have the substring "202"
+            if (preg_match('/^HTTP\/\S+\s+202/', $header)) {
                 return true;
             }
         }
